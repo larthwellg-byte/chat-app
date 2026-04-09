@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Chat App</title>
+</head>
+<body>
+
+<h2>Account</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="signup()">Sign Up</button>
+<button onclick="login()">Login</button>
+
+<h2>Chat</h2>
+<div id="messages"></div>
+<input id="msg" placeholder="Type message">
+<button onclick="sendMessage()">Send</button>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔑 PASTE YOUR CONFIG HERE
+const firebaseConfig =const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "your-app.firebaseapp.com",
+  projectId: "your-app",
+}; ;
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
+
+// SIGN UP
+window.signup = async () => {
+  await createUserWithEmailAndPassword(auth, email.value, password.value);
+  alert("Account created!");
+};
+
+// LOGIN
+window.login = async () => {
+  await signInWithEmailAndPassword(auth, email.value, password.value);
+  alert("Logged in!");
+};
+
+// SEND MESSAGE
+window.sendMessage = async () => {
+  await addDoc(collection(db, "messages"), {
+    text: msg.value,
+    user: auth.currentUser.email
+  });
+  msg.value = "";
+};
+
+// RECEIVE MESSAGES (REAL-TIME)
+onSnapshot(collection(db, "messages"), (snapshot) => {
+  messages.innerHTML = "";
+  snapshot.forEach(doc => {
+    let data = doc.data();
+    messages.innerHTML += `<p><b>${data.user}:</b> ${data.text}</p>`;
+  });
+});
+</script>
+
+</body>
+</html>
